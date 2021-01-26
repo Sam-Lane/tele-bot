@@ -32,7 +32,6 @@ func main() {
 	bot.RegisterCommand("twitchinfo", twitch.TwitchInfo)
 
 	bot.RegisterCommand("roll", func(msg *tgbotapi.Message, bot *tgbotapi.BotAPI, reply *tgbotapi.MessageConfig) {
-		ker
 		rand.Seed(time.Now().UnixNano())
 		reply.Text = strconv.FormatInt(int64(rand.Intn(101)), 10)
 		bot.Send(reply)
