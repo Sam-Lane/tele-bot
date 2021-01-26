@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 type StackOverResult struct {
@@ -39,7 +41,18 @@ type StackOverResults struct {
 	Items []StackOverResult
 }
 
-func Query(query string) (StackOverResults, error) {
+func StackOverFlowQuery(msg *tgbotapi.Message, bot *tgbotapi.BotAPI, reply *tgbotapi.MessageConfig) {
+	res, err := query(msg.CommandArguments())
+	if err != nil {
+		reply.Text = err.Error()
+		bot.Send(reply)
+		return
+	}
+	msg.Text = res.Items[0].Link
+	bot.Send(reply)
+}
+
+func query(query string) (StackOverResults, error) {
 	sRes := StackOverResults{}
 	safe := url.QueryEscape(query)
 	url := fmt.Sprintf("https://api.stackexchange.com/2.2/search?order=desc&sort=votes&intitle=%s&site=stackoverflow", safe)

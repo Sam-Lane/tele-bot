@@ -5,10 +5,25 @@ import (
 	"log"
 	"os"
 
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/nicklaw5/helix"
 )
 
-func GetChannelInfo(channel string) (helix.Channel, error) {
+func TwitchInfo(msg *tgbotapi.Message, bot *tgbotapi.BotAPI, reply *tgbotapi.MessageConfig) {
+	channel, err := getChannelInfo(msg.CommandArguments())
+	if err != nil {
+		reply.Text = err.Error()
+	} else {
+		var online = "💤"
+		if channel.IsLive {
+			online = "🔴"
+		}
+		reply.Text = fmt.Sprintf("%s\n\n%s\nhttps://twitch.tv/%s", channel.Title, online, channel.DisplayName)
+	}
+	bot.Send(reply)
+}
+
+func getChannelInfo(channel string) (helix.Channel, error) {
 	client, err := helix.NewClient(&helix.Options{
 		ClientID:     "13mplr22v7515sx1d5y67e8q73w3t8",
 		ClientSecret: "10a49cejt9jloxqqp4hnq8jrhxy7bb",
