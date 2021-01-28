@@ -35,7 +35,7 @@ func (b *Bot) Start() {
 
 			cmd, ok := b.Commands[update.Message.Command()]
 			if ok {
-				cmd(update.Message, b.tgBot, &reply)
+				go cmd(update.Message, b.tgBot, &reply)
 			}
 		}
 	}
