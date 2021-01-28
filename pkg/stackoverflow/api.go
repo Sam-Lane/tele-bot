@@ -48,7 +48,7 @@ func StackOverFlowQuery(msg *tgbotapi.Message, bot *tgbotapi.BotAPI, reply *tgbo
 		bot.Send(reply)
 		return
 	}
-	msg.Text = res.Items[0].Link
+	reply.Text = res.Items[0].Link
 	bot.Send(reply)
 }
 

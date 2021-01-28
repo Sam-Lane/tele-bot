@@ -1,12 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
 	"github.com/joho/godotenv"
 	"github.com/sam-lane/tele-bot/pkg/bot"
 	"github.com/sam-lane/tele-bot/pkg/deathroll"
+	"github.com/sam-lane/tele-bot/pkg/eightball"
 	"github.com/sam-lane/tele-bot/pkg/stackoverflow"
 	"github.com/sam-lane/tele-bot/pkg/twitch"
 )
@@ -14,7 +16,7 @@ import (
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		panic("failed to load .env")
+		fmt.Println("failed to load .env")
 	}
 
 	key := os.Getenv("TELEGRAMKEY")
@@ -27,8 +29,8 @@ func main() {
 
 	bot.RegisterCommand("stackoverflow", stackoverflow.StackOverFlowQuery)
 	bot.RegisterCommand("twitchinfo", twitch.TwitchInfo)
-
 	bot.RegisterCommand("roll", deathroll.ExecCommand)
+	bot.RegisterCommand("8ball", eightball.Ball)
 
 	bot.Start()
 }
