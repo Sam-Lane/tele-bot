@@ -14,11 +14,12 @@ func TwitchInfo(msg *tgbotapi.Message, bot *tgbotapi.BotAPI, reply *tgbotapi.Mes
 	if err != nil {
 		reply.Text = err.Error()
 	} else {
-		var online = "💤"
+		var online = "💤 Offline"
 		if channel.IsLive {
-			online = "🔴"
+			online = "🔴 Online"
 		}
 		reply.Text = fmt.Sprintf("%s\n\n%s\nhttps://twitch.tv/%s", channel.Title, online, channel.DisplayName)
+		reply.DisableWebPagePreview = true
 	}
 	bot.Send(reply)
 }
