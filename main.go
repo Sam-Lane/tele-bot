@@ -2,11 +2,16 @@ package main
 
 import (
 	"log"
+	"math/rand"
 	"os"
+	"strconv"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/joho/godotenv"
-	"github.com/sam-lane/tele-bot/pkg/chat"
+	"github.com/sam-lane/tele-bot/pkg/bot"
+	"github.com/sam-lane/tele-bot/pkg/stackoverflow"
+	"github.com/sam-lane/tele-bot/pkg/twitch"
 )
 
 func main() {
@@ -17,39 +22,20 @@ func main() {
 
 	key := os.Getenv("TELEGRAMKEY")
 
-	bot, err := tgbotapi.NewBotAPI(key)
+	bot, err := bot.NewBot(key, 0, 60)
+
 	if err != nil {
 		log.Panic(err)
 	}
 
-	bot.Debug = false
+	bot.RegisterCommand("stackoverflow", stackoverflow.StackOverFlowQuery)
+	bot.RegisterCommand("twitchinfo", twitch.TwitchInfo)
 
-	log.Printf("Authorized on account %s", bot.Self.UserName)
-	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 60
+	bot.RegisterCommand("roll", func(msg *tgbotapi.Message, bot *tgbotapi.BotAPI, reply *tgbotapi.MessageConfig) {
+		rand.Seed(time.Now().UnixNano())
+		reply.Text = strconv.FormatInt(int64(rand.Intn(101)), 10)
+		bot.Send(reply)
+	})
 
-	updates, err := bot.GetUpdatesChan(u)
-
-	for update := range updates {
-		if update.Message == nil {
-			continue
-		}
-
-		log.Printf("[%s]-[%d] %s", update.Message.From.UserName, update.Message.Chat.ID, update.Message.Text)
-
-		if update.Message.IsCommand() {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
-
-			switch update.Message.Command() {
-			case "stackoverflow":
-				chat.StackOverFlowQuery(update.Message.CommandArguments(), bot, msg)
-			case "twitchinfo":
-				chat.TwitchInfo(update.Message.CommandArguments(), bot, msg)
-			}
-			//bot.Send(msg)
-			//sticker := tgbotapi.NewStickerShare(msg.ChatID, "CAACAgIAAxkBAAMdX3sVqJuYfKiWnANg2_P3RVw5bIQAAtkCAALoPPca_LbYWdCxUOcbBA")
-
-		}
-
-	}
+	bot.Start()
 }
